@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1512">
+<title>Islohot</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{--bg:#0b1512;--card:#13231e;--card2:#1a2f28;--line:#24413a;--tx:#e6efe9;--mut:#8aa79b;--ac:#2fa37a;--gold:#d4a72c;--red:#c2564b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+main{max-width:640px;margin:0 auto;padding:14px}
+h1{font-size:19px;margin:4px 0 2px}h2{font-size:16px;margin:18px 0 8px}
+.sub{color:var(--mut);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.hero{display:flex;align-items:center;gap:14px}
+.ring text{fill:var(--tx);font-weight:700;font-size:17px}
+.strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}
+.chip{flex:0 0 auto;min-width:52px;text-align:center;padding:8px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--mut);font-size:12px}
+.chip b{display:block;font-size:16px;color:var(--tx)}
+.chip.on{background:var(--ac);border-color:var(--ac);color:#fff}.chip.on b{color:#fff}
+.chip.full{border-color:var(--gold)}
+.chip i{display:block;font-style:normal;font-size:10px;opacity:.85}
+.chip.td:not(.on){border-color:var(--gold);color:var(--gold)}.chip.fut:not(.on){opacity:.5}
+td.tc{background:#1d3a31}
+.row{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:8px;width:100%;color:var(--tx);font:inherit;text-align:left}
+.box{flex:0 0 26px;height:26px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;color:transparent;font-weight:700}
+.done .box{background:var(--ac);border-color:var(--ac);color:#fff}
+.done .nm{color:var(--mut);text-decoration:line-through}
+.tw{overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--card);max-height:70vh}
+table{border-collapse:separate;border-spacing:0;font-size:12px}
+th,td{padding:0;text-align:center;border-bottom:1px solid var(--line);border-right:1px solid var(--line);min-width:38px;height:38px}
+th{background:var(--card2);color:var(--mut);font-weight:600;position:sticky;top:0;z-index:2}
+td:first-child,th:first-child{position:sticky;left:0;z-index:3;min-width:112px;max-width:112px;background:var(--card2);text-align:left;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell{width:100%;height:100%;background:none;border:0;color:transparent;font-size:15px}
+.cell.y{background:var(--ac);color:#fff}
+.today{color:var(--gold)}
+.bar{height:8px;background:var(--card2);border-radius:6px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--gold))}
+.stats{display:flex;gap:16px;font-size:12px;color:var(--mut)}
+input,textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--tx);padding:10px;font:inherit}
+textarea{min-height:90px;resize:vertical}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:600}
+.btn.g{background:var(--card2);color:var(--tx);border:1px solid var(--line)}.btn.r{background:var(--red)}
+.line{display:flex;gap:8px;margin-bottom:8px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#0e1c18;border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:9}
+nav button{flex:1;background:none;border:0;color:var(--mut);font:inherit;font-size:11px;padding:6px 0}
+nav button span{display:block;font-size:20px}nav .on{color:var(--gold)}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+const N=40,MO=['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'],KEY='islohot-v1';
+const uid=()=>Math.random().toString(36).slice(2,8);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const NAMES=['Tahajjud',"Istig'for","Qur'on",'Mutolaa (ixyo)','Mutolaa (badiiy)','Ingliz tili dars','Kechki namoz','Uyqu','Badan tarbiya','Namoz'];
+const def=()=>({start:iso(new Date()),habits:NAMES.map(n=>({id:uid(),name:n})),checks:{},sel:0,
+notes:[{id:uid(),t:"Istig'for",x:"Ushbuning ichiga tongda va tunda 100 tadan - salovat, istig'for, tavhid bundan tashqari 1001 ta ixlos surasini o'qish kiradi."},{id:uid(),t:'Uyquning tartibi',x:'Soat 10:30 da uxlab, 4:30 da turiladi.'}]});
+let S,tab=0,pend=null;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.habits)S=def();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const dd=i=>{const [y,m,d]=S.start.split('-').map(Number);return new Date(y,m-1,d+i)};
+const lbl=i=>{const d=dd(i);return d.getDate()+' '+MO[d.getMonth()]};
+const WD=['Yak','Dush','Sesh','Chor','Pay','Jum','Shan'],WDF=['Yakshanba','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'];
+const wd=i=>WD[dd(i).getDay()];
+const rawIdx=()=>{const [y,m,d]=S.start.split('-').map(Number),t=new Date();return Math.round((new Date(t.getFullYear(),t.getMonth(),t.getDate())-new Date(y,m-1,d))/864e5)};
+const todayIdx=()=>Math.min(N-1,Math.max(0,rawIdx()));
+const get=(h,i)=>!!(S.checks[h.id]||[])[i];
+const cnt=i=>S.habits.filter(h=>get(h,i)).length;
+const pct=i=>S.habits.length?Math.round(cnt(i)/S.habits.length*100):0;
+const tog=(id,i)=>{const a=S.checks[id]||(S.checks[id]=Array(N).fill(false));a[i]=!a[i];save()};
+function streak(h){let cur=0,best=0,run=0;for(let i=0;i<N;i++){if(get(h,i)){run++;best=Math.max(best,run)}else run=0}
+for(let i=todayIdx();i>=0&&get(h,i);i--)cur++;return[cur,best]}
+S.sel=todayIdx();
+
+function ring(p){const c=2*Math.PI*34;return `<svg class="ring" width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="#24413a" stroke-width="9"/><circle cx="42" cy="42" r="34" fill="none" stroke="${p==100?'#d4a72c':'#2fa37a'}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-p/100)}" transform="rotate(-90 42 42)"/><text x="42" y="48" text-anchor="middle">${p}%</text></svg>`}
+
+const views=[
+()=>{const i=S.sel,p=pct(i);
+return `<h1>Alloh roziligiga erishish uchun yangi harakat</h1><div class="sub">Bugun: ${WDF[new Date().getDay()]}, ${new Date().getDate()} ${MO[new Date().getMonth()]} ${new Date().getFullYear()}</div>
+${rawIdx()>=N?`<div class="card" style="margin-top:10px"><b>40 kunlik sikl tugadi 🎉</b><div class="sub" style="margin:4px 0 10px">Yangi sikl bugundan boshlanadi.</div><button class="btn ${pend=='nc'?'r':''}" data-nc>${pend=='nc'?"Tasdiqlang (eski belgilar o'chadi)":'Yangi 40 kunni boshlash'}</button></div>`:rawIdx()<0?`<div class="card sub" style="margin-top:10px">Boshlanish sanasi hali kelmagan (${lbl(0)}).</div>`:''}
+<div class="strip" style="margin-top:10px">${Array.from({length:N},(_,k)=>`<button class="chip ${k==i?'on':''} ${pct(k)==100?'full':''} ${k==rawIdx()?'td':''} ${k>rawIdx()?'fut':''}" data-day="${k}"><b>${k+1}</b>${lbl(k)}<i>${wd(k)}</i></button>`).join('')}</div>
+${i!=todayIdx()?'<button class="btn g" data-today style="margin-bottom:10px">Bugungi kunga o\'tish</button>':''}<div class="card hero">${ring(p)}<div><b style="font-size:17px">${i+1}-kun · ${lbl(i)}, ${wd(i)}${i==rawIdx()?' · bugun':''}</b><div class="sub">${cnt(i)} / ${S.habits.length} bajarildi</div></div></div>
+${S.habits.map(h=>`<button class="row ${get(h,i)?'done':''}" data-t="${h.id}|${i}"><span class="box">✓</span><span class="nm">${esc(h.name)}</span></button>`).join('')||'<div class="sub">Sozlamalarda amal qo\'shing.</div>'}`},
+()=>`<h1>Jadval</h1><div class="sub">Katakni bosib belgilang · ${N} kun</div><div class="tw" style="margin-top:10px"><table><tr><th>№</th>${Array.from({length:N},(_,k)=>`<th>${k+1}</th>`).join('')}</tr>
+<tr><th>kun</th>${Array.from({length:N},(_,k)=>`<th class="${k==todayIdx()?'today':''}">${dd(k).getDate()}</th>`).join('')}</tr>
+${S.habits.map(h=>`<tr><td>${esc(h.name)}</td>${Array.from({length:N},(_,k)=>`<td class="${k==todayIdx()?'tc':''}"><button class="cell ${get(h,k)?'y':''}" data-t="${h.id}|${k}">✓</button></td>`).join('')}</tr>`).join('')}
+<tr><th>%</th>${Array.from({length:N},(_,k)=>`<th>${pct(k)}</th>`).join('')}</tr></table></div>`,
+()=>{const tot=S.habits.length*N,d=S.habits.reduce((a,h)=>a+(S.checks[h.id]||[]).filter(Boolean).length,0),full=Array.from({length:N},(_,k)=>k).filter(k=>S.habits.length&&pct(k)==100).length;
+return `<h1>Statistika</h1><div class="card hero">${ring(tot?Math.round(d/tot*100):0)}<div><b>Umumiy natija</b><div class="sub">${d} / ${tot} bajarilgan<br>To'liq bajarilgan kunlar: ${full}</div></div></div>
+${S.habits.map(h=>{const c=(S.checks[h.id]||[]).filter(Boolean).length,[cu,b]=streak(h);return `<div class="card"><b>${esc(h.name)}</b><div class="bar"><i style="width:${c/N*100}%"></i></div><div class="stats"><span>${c}/${N} kun</span><span>Ketma-ket: ${cu}</span><span>Eng uzun: ${b}</span></div></div>`}).join('')}`},
+()=>`<h1>Eslatmalar</h1>${S.notes.map(n=>`<div class="card"><input data-nt="${n.id}" value="${esc(n.t)}" placeholder="Sarlavha" style="font-weight:700;margin-bottom:8px"><textarea data-nx="${n.id}" placeholder="Matn">${esc(n.x)}</textarea><div style="margin-top:8px"><button class="btn ${pend==n.id?'r':'g'}" data-dn="${n.id}">${pend==n.id?'Tasdiqlang':'O\'chirish'}</button></div></div>`).join('')}<button class="btn" data-an>+ Eslatma qo'shish</button>`,
+()=>`<h1>Sozlamalar</h1><h2>Boshlanish sanasi (1-kun)</h2><input type="date" value="${S.start}" data-start><button class="btn g" data-startnow style="margin-top:8px">Bugundan boshlash</button>
+<h2>Amallar</h2>${S.habits.map(h=>`<div class="line"><input data-rn="${h.id}" value="${esc(h.name)}"><button class="btn ${pend==h.id?'r':'g'}" data-dh="${h.id}">${pend==h.id?'Ha':'✕'}</button></div>`).join('')}
+<div class="line"><input id="nh" placeholder="Yangi amal nomi"><button class="btn" data-ah>Qo'shish</button></div>
+<h2>Zaxira nusxa</h2><textarea id="bk" style="min-height:70px;font-size:11px">${esc(JSON.stringify(S))}</textarea>
+<div class="line" style="margin-top:8px"><button class="btn g" data-imp>Matndan tiklash</button><button class="btn ${pend=='rst'?'r':'g'}" data-rst>${pend=='rst'?'Tasdiqlang':'Hammasini tozalash'}</button></div>`
+];
+const tabs=[['🌙','Bugun'],['▦','Jadval'],['📈','Natija'],['📝','Eslatma'],['⚙️','Sozlama']];
+function render(){const a=document.getElementById('app'),w=a.querySelector('.tw'),sl=w?[w.scrollLeft,w.scrollTop]:null,sy=scrollY;
+a.innerHTML=views[tab]();
+document.getElementById('nav').innerHTML=tabs.map((t,i)=>`<button class="${i==tab?'on':''}" data-tab="${i}"><span>${t[0]}</span>${t[1]}</button>`).join('');
+const nw=a.querySelector('.tw');if(nw&&sl){nw.scrollLeft=sl[0];nw.scrollTop=sl[1]}
+else if(nw){nw.scrollLeft=Math.max(0,todayIdx()*38-60)}
+const c=a.querySelector('.chip.on');if(c)c.scrollIntoView({inline:'center',block:'nearest'});scrollTo(0,sy)}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const D=b.dataset;
+if(D.tab!=null){tab=+D.tab;pend=null;render();scrollTo(0,0);return}
+if(D.day!=null)S.sel=+D.day;
+else if(D.t){const[id,i]=D.t.split('|');tog(id,+i)}
+else if(D.today!=null)S.sel=todayIdx();
+else if(D.startnow!=null){S.start=iso(new Date());S.sel=0}
+else if(D.nc!=null){if(pend=='nc'){S.start=iso(new Date());S.checks={};S.sel=0;pend=null}else pend='nc'}
+else if(D.an!=null)S.notes.push({id:uid(),t:'',x:''});
+else if(D.dn){if(pend==D.dn){S.notes=S.notes.filter(n=>n.id!=D.dn);pend=null}else{pend=D.dn}}
+else if(D.dh){if(pend==D.dh){S.habits=S.habits.filter(h=>h.id!=D.dh);delete S.checks[D.dh];pend=null}else{pend=D.dh}}
+else if(D.ah!=null){const v=document.getElementById('nh').value.trim();if(!v)return;S.habits.push({id:uid(),name:v})}
+else if(D.imp!=null){try{const o=JSON.parse(document.getElementById('bk').value);if(o&&o.habits){S=o;S.sel=todayIdx()}}catch(x){return}}
+else if(D.rst!=null){if(pend=='rst'){S=def();S.sel=0;pend=null}else pend='rst'}
+else return;
+save();render()});
+document.addEventListener('input',e=>{const D=e.target.dataset;
+if(D.rn)S.habits.find(h=>h.id==D.rn).name=e.target.value;
+else if(D.nt)S.notes.find(n=>n.id==D.nt).t=e.target.value;
+else if(D.nx)S.notes.find(n=>n.id==D.nx).x=e.target.value;
+else if(D.start!=null&&e.target.value){S.start=e.target.value;S.sel=todayIdx()}
+else return;save()});
+let lastD=iso(new Date());
+function sync(){const n=iso(new Date());if(n!==lastD){lastD=n;S.sel=todayIdx();render()}}
+setInterval(sync,30000);addEventListener('focus',sync);document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
+render();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
